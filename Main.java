@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileWriter;
+import java.util.List;
 import java.util.Random;
 
 public class Main {
@@ -9,8 +10,8 @@ public class Main {
         // If you need to regenerate data, uncomment the line below.
         // generateSampleData("ecommerce_products.csv");
 
-        // Now read the data into our dynamic data structure (linked list)
-        ProductLinkedList productList = new ProductLinkedList();
+        // Now read the data into the HashMap-based data store
+        ProductDataStore dataStore = new ProductDataStore();
         
         try (BufferedReader br = new BufferedReader(new FileReader("ecommerce_products.csv"))) {
             String line = br.readLine(); // skip header
@@ -24,21 +25,21 @@ public class Main {
                 int numberSold = Integer.parseInt(tokens[5]);
 
                 Product p = new Product(id, category, price, productName, stockQuantity, numberSold);
-                productList.insert(p);
+                dataStore.insert(p);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Demonstrate searching
-        Product foundById = productList.searchById(50);
+        Product foundById = dataStore.searchById(50);
         if (foundById != null) {
             System.out.println("Found product by ID (50): " + foundById);
         } else {
             System.out.println("No product found with ID 50.");
         }
 
-        Product foundByName = productList.searchByName("Product100");
+        Product foundByName = dataStore.searchByName("Product100");
         if (foundByName != null) {
             System.out.println("Found product by name (Product100): " + foundByName);
         } else {
@@ -47,16 +48,18 @@ public class Main {
 
         // Demonstrate sorting by price
         System.out.println("\nSorting products by price...");
-        productList.sortByPrice();
-        productList.printAll();
+        List<Product> sortedProducts = dataStore.sortByPrice();
+        for (Product p : sortedProducts) {
+            System.out.println(p);
+        }
 
         // Demonstrate deletion
-        boolean deleted = productList.deleteById(10);
+        boolean deleted = dataStore.deleteById(10);
         System.out.println("\nDeletion of product with ID 10: " + (deleted ? "Success" : "Fail"));
 
         // Demonstrate aggregations
-        System.out.println("Total stock in inventory: " + productList.totalStock());
-        System.out.println("Average price of products: " + productList.averagePrice());
+        System.out.println("Total stock in inventory: " + dataStore.totalStock());
+        System.out.println("Average price of products: " + dataStore.averagePrice());
     }
 
     private static void generateSampleData(String csvFile) {
