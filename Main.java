@@ -8,15 +8,16 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static final String CSV_FILE = "ecommerce_products.csv";
     private static ProductDataStore dataStore = new ProductDataStore();
 
     public static void main(String[] args) {
-        // If you need to regenerate data, uncomment the line below.
-        // generateSampleData("ecommerce_products.csv");
+        // UNCOMMENT BELOW IF NEED TO GENERATE NEW DATA
+        // generateSampleData(CSV_FILE);
 
-        loadDataFromCSV("ecommerce_products.csv");
+        loadDataFromCSV(CSV_FILE);
 
-        // Launch the interactive menu
+        // Launches the demonstration/testing menu
         runMenu();
     }
 
@@ -40,6 +41,25 @@ public class Main {
         }
     }
 
+    private static void saveDataToCSV(String csvFile) {
+        try (FileWriter writer = new FileWriter(csvFile)) {
+            // Write header
+            writer.write("ID,Category,Price,ProductName,StockQuantity,NumberSold\n");
+            
+            // Write all products
+            for (Product p : dataStore.getAllProducts()) {
+                writer.write(p.getId() + "," 
+                           + p.getCategory() + "," 
+                           + p.getPrice() + "," 
+                           + p.getProductName() + "," 
+                           + p.getStockQuantity() + "," 
+                           + p.getNumberSold() + "\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving data: " + e.getMessage());
+        }
+    }
+
     private static void runMenu() {
         Scanner scanner = new Scanner(System.in);
         int choice;
@@ -53,10 +73,10 @@ public class Main {
             System.out.println("5. Sort Products by Category and Display");
             System.out.println("6. Display Total Stock and Average Price");
             System.out.println("7. Display All Products");
+            System.out.println("8. Update Product by ID");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
-            // Validate input
             while (!scanner.hasNextInt()) {
                 System.out.print("Please enter a valid number: ");
                 scanner.next();
@@ -85,6 +105,9 @@ public class Main {
                 case 7:
                     displayAllProducts();
                     break;
+                case 8:
+                    updateProductById(scanner);
+                    break;
                 case 0:
                     System.out.println("Exiting program. Thank you!");
                     break;
@@ -110,7 +133,7 @@ public class Main {
 
     private static void searchByName(Scanner scanner) {
         System.out.print("Enter product name to search: ");
-        scanner.nextLine(); // consume the leftover newline
+        scanner.nextLine(); // consume leftover newline
         String name = scanner.nextLine();
         Product p = dataStore.searchByName(name);
         if (p != null) {
@@ -138,7 +161,8 @@ public class Main {
 
         Product p = new Product(id, category, price, productName, stock, sold);
         dataStore.insert(p);
-        System.out.println("Product inserted successfully!");
+        saveDataToCSV(CSV_FILE); // update CSV after insertion
+        System.out.println("Product inserted successfully and CSV file updated!");
     }
 
     private static void deleteById(Scanner scanner) {
@@ -146,7 +170,8 @@ public class Main {
         int id = scanner.nextInt();
         boolean deleted = dataStore.deleteById(id);
         if (deleted) {
-            System.out.println("Product with ID " + id + " deleted successfully.");
+            saveDataToCSV(CSV_FILE); // update CSV after deletion
+            System.out.println("Product with ID " + id + " deleted successfully and CSV file updated.");
         } else {
             System.out.println("No product found with ID: " + id);
         }
@@ -170,6 +195,55 @@ public class Main {
     private static void displayAllProducts() {
         System.out.println("All Products in the Data Store:");
         dataStore.printAll();
+    }
+
+    private static void updateProductById(Scanner scanner) {
+        System.out.print("Enter product ID to update: ");
+        int id = scanner.nextInt();
+        Product p = dataStore.searchById(id);
+        if (p == null) {
+            System.out.println("No product found with ID: " + id);
+            return;
+        }
+
+        scanner.nextLine(); // consume newline
+        System.out.println("Current product details: " + p);
+
+        System.out.print("Enter new category (or press Enter to keep [" + p.getCategory() + "]): ");
+        String newCategory = scanner.nextLine();
+        if (!newCategory.trim().isEmpty()) {
+            p.setCategory(newCategory);
+        }
+
+        System.out.print("Enter new price (or press Enter to keep [" + p.getPrice() + "]): ");
+        String priceInput = scanner.nextLine();
+        if (!priceInput.trim().isEmpty()) {
+            double newPrice = Double.parseDouble(priceInput);
+            p.setPrice(newPrice);
+        }
+
+        System.out.print("Enter new product name (or press Enter to keep [" + p.getProductName() + "]): ");
+        String newName = scanner.nextLine();
+        if (!newName.trim().isEmpty()) {
+            p.setProductName(newName);
+        }
+
+        System.out.print("Enter new stock quantity (or press Enter to keep [" + p.getStockQuantity() + "]): ");
+        String stockInput = scanner.nextLine();
+        if (!stockInput.trim().isEmpty()) {
+            int newStock = Integer.parseInt(stockInput);
+            p.setStockQuantity(newStock);
+        }
+
+        System.out.print("Enter new number sold (or press Enter to keep [" + p.getNumberSold() + "]): ");
+        String soldInput = scanner.nextLine();
+        if (!soldInput.trim().isEmpty()) {
+            int newSold = Integer.parseInt(soldInput);
+            p.setNumberSold(newSold);
+        }
+
+        saveDataToCSV(CSV_FILE);
+        System.out.println("Product updated successfully and CSV file updated!");
     }
 
     private static void generateSampleData(String csvFile) {

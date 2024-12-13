@@ -15,6 +15,7 @@ public class Product {
         this.numberSold = numberSold;
     }
 
+    // Getters and setters
     public int getId() {
         return id;
     }
@@ -43,11 +44,22 @@ public class Product {
         this.price = price;
     }
 
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+    
     public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
     }
-
-    // A useful toString method for debugging and display
+    
+    public void setNumberSold(int numberSold) {
+        this.numberSold = numberSold;
+    }
+    
     @Override
     public String toString() {
         return "Product[ID=" + id + ", Category=" + category + ", Price=" + price

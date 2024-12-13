@@ -9,17 +9,17 @@ public class ProductDataStore {
         productMap = new HashMap<>();
     }
 
-    // Insertion
+    // Insertion O(1)
     public void insert(Product product) {
         productMap.put(product.getId(), product);
     }
 
-    // Search by ID (O(1) average)
+    // Search by ID O(1)
     public Product searchById(int id) {
         return productMap.get(id);
     }
 
-    // Search by Name (O(n))
+    // Search by Name O(n)
     public Product searchByName(String name) {
         for (Product p : productMap.values()) {
             if (p.getProductName().equalsIgnoreCase(name)) {
@@ -29,12 +29,12 @@ public class ProductDataStore {
         return null;
     }
 
-    // Deletion by ID (O(1) average)
+    // Deletion by ID O(1)
     public boolean deleteById(int id) {
         return productMap.remove(id) != null;
     }
 
-    // Sorting by Category (alphabetical order) using custom mergesort
+    // Sorting by Category (alphabetical order) using mergesort algorithm
     public List<Product> sortByCategory() {
         List<Product> productList = new ArrayList<>(productMap.values());
         mergeSort(productList, 0, productList.size() - 1);
@@ -42,7 +42,7 @@ public class ProductDataStore {
     }
 
     // Aggregation operations:
-    // Total stock (O(n))
+    // Total stock O(n)
     public int totalStock() {
         int total = 0;
         for (Product p : productMap.values()) {
@@ -69,14 +69,18 @@ public class ProductDataStore {
             System.out.println(p);
         }
     }
+    
+    public List<Product> getAllProducts() {
+        return new ArrayList<>(productMap.values());
+    }
+    
 
     public int size() {
         return productMap.size();
     }
 
-    // -------------------------------
-    // MergeSort Implementation for Category (alphabetical order)
-    // -------------------------------
+
+    // MergeSort implementation for category
     private void mergeSort(List<Product> list, int left, int right) {
         if (left < right) {
             int mid = (left + right) / 2;
@@ -87,7 +91,7 @@ public class ProductDataStore {
     }
 
     private void merge(List<Product> list, int left, int mid, int right) {
-        // Create temporary lists
+        // Create the two temporary lists
         int sizeLeft = mid - left + 1;
         int sizeRight = right - mid;
 
@@ -127,7 +131,7 @@ public class ProductDataStore {
             k++;
         }
 
-        // Copy remaining elements of rightList if any
+        // and rightlist if any
         while (j < sizeRight) {
             list.set(k, rightList.get(j));
             j++;
