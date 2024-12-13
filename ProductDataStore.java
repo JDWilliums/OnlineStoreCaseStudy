@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ProductDataStore {
     private HashMap<Integer, Product> productMap;
@@ -32,11 +34,10 @@ public class ProductDataStore {
         return productMap.remove(id) != null;
     }
 
-    // Sorting by Price (O(n log n)):
-    // Extract values into ArrayList, sort them, and return or print them
-    public List<Product> sortByPrice() {
+    // Sorting by Category (alphabetical order) using custom mergesort
+    public List<Product> sortByCategory() {
         List<Product> productList = new ArrayList<>(productMap.values());
-        productList.sort(Comparator.comparingDouble(Product::getPrice));
+        mergeSort(productList, 0, productList.size() - 1);
         return productList;
     }
 
@@ -71,5 +72,66 @@ public class ProductDataStore {
 
     public int size() {
         return productMap.size();
+    }
+
+    // -------------------------------
+    // MergeSort Implementation for Category (alphabetical order)
+    // -------------------------------
+    private void mergeSort(List<Product> list, int left, int right) {
+        if (left < right) {
+            int mid = (left + right) / 2;
+            mergeSort(list, left, mid);
+            mergeSort(list, mid + 1, right);
+            merge(list, left, mid, right);
+        }
+    }
+
+    private void merge(List<Product> list, int left, int mid, int right) {
+        // Create temporary lists
+        int sizeLeft = mid - left + 1;
+        int sizeRight = right - mid;
+
+        List<Product> leftList = new ArrayList<>(sizeLeft);
+        List<Product> rightList = new ArrayList<>(sizeRight);
+
+        for (int i = 0; i < sizeLeft; i++) {
+            leftList.add(list.get(left + i));
+        }
+        for (int j = 0; j < sizeRight; j++) {
+            rightList.add(list.get(mid + 1 + j));
+        }
+
+        // Merge the temporary lists back into the main list
+        int i = 0; // Initial index of left sublist
+        int j = 0; // Initial index of right sublist
+        int k = left; // Initial index of merged sublist
+
+        while (i < sizeLeft && j < sizeRight) {
+            // Compare categories alphabetically
+            String leftCategory = leftList.get(i).getCategory();
+            String rightCategory = rightList.get(j).getCategory();
+            if (leftCategory.compareToIgnoreCase(rightCategory) <= 0) {
+                list.set(k, leftList.get(i));
+                i++;
+            } else {
+                list.set(k, rightList.get(j));
+                j++;
+            }
+            k++;
+        }
+
+        // Copy remaining elements of leftList if any
+        while (i < sizeLeft) {
+            list.set(k, leftList.get(i));
+            i++;
+            k++;
+        }
+
+        // Copy remaining elements of rightList if any
+        while (j < sizeRight) {
+            list.set(k, rightList.get(j));
+            j++;
+            k++;
+        }
     }
 }
